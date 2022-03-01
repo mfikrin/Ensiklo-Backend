@@ -55,5 +55,34 @@ namespace PPL.Controllers
 
         }
 
+        [HttpDelete("{id}")]
+        public JsonResult Delete(int id)
+        {
+            string query = @"
+                DELETE FROM books
+                where id_book=@id_book
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader myReader;
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@id_book", id);
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+
+                    myReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+            return new JsonResult("Deleted Successfully");
+        }
+
     }
 }
