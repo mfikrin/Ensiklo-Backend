@@ -55,6 +55,42 @@ namespace PPL.Controllers
 
         }
 
+        [HttpGet("{id}")]
+
+        public JsonResult Get(int id)
+        {
+            string query = @"
+               SELECT * FROM books
+               WHERE id_book=@id_book
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@id_book", id);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
+
+
 
         [HttpPost]
         public JsonResult Post(Book book)
