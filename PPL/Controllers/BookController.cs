@@ -55,6 +55,96 @@ namespace PPL.Controllers
 
         }
 
+
+        [HttpPost]
+        public JsonResult Post(Book book)
+        {
+            string query = @"
+                INSERT INTO 
+                books(title,author,publisher,year_published,description_book,book_content,url_cover,category,keywords)
+                values (@title,@author,@publisher,@year_published,@description_book,@book_content,@url_cover,@category,@keywords)
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader myReader;
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@title", book.title);
+                    myCommand.Parameters.AddWithValue("@author", book.author);
+                    myCommand.Parameters.AddWithValue("@publisher", book.publisher);
+                    myCommand.Parameters.AddWithValue("@year_published", book.year_published);
+                    myCommand.Parameters.AddWithValue("@description_book", book.description_book);
+                    myCommand.Parameters.AddWithValue("@book_content", book.book_content);
+                    myCommand.Parameters.AddWithValue("@url_cover", book.url_cover);
+                    myCommand.Parameters.AddWithValue("@category", book.category);
+                    myCommand.Parameters.AddWithValue("@keywords", book.keywords);
+
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+
+                    myReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+            return new JsonResult("Added Successfully");
+        }
+
+        [HttpPut]
+        public JsonResult Put(Book book)
+        {
+            string query = @"
+                UPDATE books
+                SET 
+                title = @title,
+                author = @author,
+                publisher = @publisher,
+                year_published = @year_published,
+                description_book = @description_book,
+                book_content = @book_content,
+                url_cover = @url_cover,
+                category = @category,
+                keywords = @keywords
+
+                WHERE id_book=@id_book 
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader myReader;
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@id_book", book.id_book);
+                    myCommand.Parameters.AddWithValue("@title", book.title);
+                    myCommand.Parameters.AddWithValue("@author", book.author);
+                    myCommand.Parameters.AddWithValue("@publisher", book.publisher);
+                    myCommand.Parameters.AddWithValue("@year_published", book.year_published);
+                    myCommand.Parameters.AddWithValue("@description_book", book.description_book);
+                    myCommand.Parameters.AddWithValue("@book_content", book.book_content);
+                    myCommand.Parameters.AddWithValue("@url_cover", book.url_cover);
+                    myCommand.Parameters.AddWithValue("@category", book.category);
+                    myCommand.Parameters.AddWithValue("@keywords", book.keywords);
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+
+                    myReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+            return new JsonResult("Updated Successfully");
+        }
+
+
         [HttpDelete("{id}")]
         public JsonResult Delete(int id)
         {
