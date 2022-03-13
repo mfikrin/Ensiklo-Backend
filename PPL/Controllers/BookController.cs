@@ -109,15 +109,15 @@ namespace PPL.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@title", book.title);
-                    myCommand.Parameters.AddWithValue("@author", book.author);
-                    myCommand.Parameters.AddWithValue("@publisher", book.publisher);
-                    myCommand.Parameters.AddWithValue("@year_published", book.year_published);
-                    myCommand.Parameters.AddWithValue("@description_book", book.description_book);
-                    myCommand.Parameters.AddWithValue("@book_content", book.book_content);
-                    myCommand.Parameters.AddWithValue("@url_cover", book.url_cover);
-                    myCommand.Parameters.AddWithValue("@category", book.category);
-                    myCommand.Parameters.AddWithValue("@keywords", book.keywords);
+                    myCommand.Parameters.AddWithValue("@title", book.Title);
+                    myCommand.Parameters.AddWithValue("@author", book.Author);
+                    myCommand.Parameters.AddWithValue("@publisher", book.Publisher);
+                    myCommand.Parameters.AddWithValue("@year_published", book.Year_published);
+                    myCommand.Parameters.AddWithValue("@description_book", book.Description_book);
+                    myCommand.Parameters.AddWithValue("@book_content", book.Book_content);
+                    myCommand.Parameters.AddWithValue("@url_cover", book.Url_cover);
+                    myCommand.Parameters.AddWithValue("@category", book.Category);
+                    myCommand.Parameters.AddWithValue("@keywords", book.Keywords);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -158,16 +158,16 @@ namespace PPL.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id_book", book.id_book);
-                    myCommand.Parameters.AddWithValue("@title", book.title);
-                    myCommand.Parameters.AddWithValue("@author", book.author);
-                    myCommand.Parameters.AddWithValue("@publisher", book.publisher);
-                    myCommand.Parameters.AddWithValue("@year_published", book.year_published);
-                    myCommand.Parameters.AddWithValue("@description_book", book.description_book);
-                    myCommand.Parameters.AddWithValue("@book_content", book.book_content);
-                    myCommand.Parameters.AddWithValue("@url_cover", book.url_cover);
-                    myCommand.Parameters.AddWithValue("@category", book.category);
-                    myCommand.Parameters.AddWithValue("@keywords", book.keywords);
+                    myCommand.Parameters.AddWithValue("@id_book", book.Id_book);
+                    myCommand.Parameters.AddWithValue("@title", book.Title);
+                    myCommand.Parameters.AddWithValue("@author", book.Author);
+                    myCommand.Parameters.AddWithValue("@publisher", book.Publisher);
+                    myCommand.Parameters.AddWithValue("@year_published", book.Year_published);
+                    myCommand.Parameters.AddWithValue("@description_book", book.Description_book);
+                    myCommand.Parameters.AddWithValue("@book_content", book.Book_content);
+                    myCommand.Parameters.AddWithValue("@url_cover", book.Url_cover);
+                    myCommand.Parameters.AddWithValue("@category", book.Category);
+                    myCommand.Parameters.AddWithValue("@keywords", book.Keywords);
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
 
