@@ -55,6 +55,105 @@ namespace PPL.Controllers
 
         }
 
+        [HttpGet]
+        [Route("sort/title")]
+
+        public JsonResult SortTitle()
+        {
+            string query = @"
+               SELECT * FROM books b order by b.title
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
+        [HttpGet]
+        [Route("sort/AddedTime")]
+        public JsonResult SortAddedTime()
+        {
+            string query = @"
+               SELECT * FROM books b order by b.added_time
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
+
+        [HttpGet]
+        [Route("sort/LastRead/{id}")]
+
+        public JsonResult SortLastRead(int id)
+        {
+            string query = @"
+               SELECT * FROM books natural join library_user where id_user = @id_user order by last_readtime
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@id_user", id);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
 
         // POST api/<LibraryUserController>
         [HttpPost]
