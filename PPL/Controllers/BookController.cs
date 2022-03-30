@@ -325,7 +325,7 @@ namespace PPL.Controllers
         public JsonResult SortLastRead(int id)
         {
             string query = @"
-               SELECT * FROM books natural join library_user where id_user = @id_user
+               SELECT * FROM books natural join library_user where id_user = @id_user order by last_readtime
             ";
 
             DataTable table = new DataTable();
