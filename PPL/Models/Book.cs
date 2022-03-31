@@ -6,7 +6,7 @@
         public string Title { get; set; }
         public string Author { get; set; }
         public string Publisher { get; set; }
-        public DateOnly Year_published { get; set; }
+        public DateTime Year_published { get; set; }
         public string Description_book { get; set; }
         public string Book_content { get; set; }
         public int Page { get; set; }
