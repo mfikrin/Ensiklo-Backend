@@ -56,6 +56,40 @@ namespace PPL.Controllers
 
         }
 
+        [HttpGet]
+        [Route("limit/{limit}")]
+
+        public JsonResult GetSomeBooks(int limit)
+        {
+            string query = @$"
+               SELECT * FROM books ORDER BY RANDOM() LIMIT @limit
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@limit", limit);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
         [HttpGet("{id}")]
 
         public JsonResult Get(int id)
