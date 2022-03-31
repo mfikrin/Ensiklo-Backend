@@ -80,8 +80,8 @@ namespace PPL.Controllers
             }
 
             HttpContext.Response.Cookies.Append("authToken", token, new CookieOptions { 
-                Expires=DateTime.Now.AddYears(5), IsEssential=true, SameSite= SameSiteMode.None});
-            return Ok(token);
+                Expires=DateTime.Now.AddYears(5), IsEssential=true, SameSite= SameSiteMode.Lax});
+            return Ok(token) ;
         }
 
         [Route("register")]
