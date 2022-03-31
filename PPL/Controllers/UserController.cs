@@ -79,7 +79,8 @@ namespace PPL.Controllers
                 }
             }
 
-            HttpContext.Response.Cookies.Append("authToken", token);
+            HttpContext.Response.Cookies.Append("authToken", token, new CookieOptions { 
+                Expires=DateTime.Now.AddYears(5), IsEssential=true, SameSite= SameSiteMode.None});
             return Ok(token);
         }
 
