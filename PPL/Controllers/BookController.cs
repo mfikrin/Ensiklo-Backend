@@ -298,5 +298,58 @@ namespace PPL.Controllers
             return new JsonResult(table);
         }
 
+        [Route("search")]
+        [HttpGet]
+        public JsonResult Search([FromQuery(Name = "title")] string title)
+        {
+            string query = @$"
+                SELECT id_book, title, url_cover
+                FROM (
+                    SELECT
+                        b.id_book,
+                        b.title,
+                        b.url_cover,
+                        CASE
+                            WHEN b.title LIKE '%{title}%' THEN 4
+                            WHEN b.author LIKE '%{title}%' THEN 3
+                            WHEN b.publisher LIKE '%{title}%' THEN 2
+                            WHEN b.description_book LIKE '%{title}%' THEN 1
+                            ELSE 0
+                        END AS score
+
+                    FROM books b
+                    WHERE
+                        b.title LIKE '%{title}%' OR
+                        b.author LIKE '%{title}%' OR
+                        b.publisher LIKE '%{title}%' OR
+                        b.description_book LIKE '%{title}%'
+                    ORDER BY score DESC
+                ) final              
+                ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
     }
 }
