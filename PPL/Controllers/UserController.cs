@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System.Data;
+using System.Diagnostics;
 using PPL.Models;
 
 namespace PPL.Controllers
@@ -129,6 +130,82 @@ namespace PPL.Controllers
             }
 
             return Ok();
+        }
+
+        [Route("getUser/{id}")]
+        [HttpGet]
+        public JsonResult GetUser(Int64 id)
+        {
+            Debug.WriteLine(HttpContext.Request.Cookies["authToken"]);
+            string query = @$"
+               SELECT * FROM users where id_user=@id
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@id", id);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
+        [Route("currentUser")]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult GetCurrent()
+        {
+            if (HttpContext.Request.Cookies["authToken"] is null)
+            {
+                return Unauthorized();
+            }
+            string token = HttpContext.Request.Cookies["authToken"];
+            string query = @$"
+               SELECT * FROM users where id_user=@id
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            Int64 id = ControllerUtils.authenticateUser(token, sqlDataSource);
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@id", id);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
         }
 
 
