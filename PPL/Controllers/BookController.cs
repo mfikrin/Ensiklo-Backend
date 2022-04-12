@@ -351,10 +351,6 @@ namespace PPL.Controllers
 
         }
 
-
-        //[HttpGet("{id}")]
-        //[Route("TopGenre")]
-
         [HttpGet]
         [Route("TopGenre/{id}/{limit}")]
         public JsonResult GetTopGenre(int id, int limit)

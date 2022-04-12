@@ -226,37 +226,5 @@ namespace PPL.Controllers
             return new JsonResult("Deleted Successfully");
         }
 
-        //[HttpGet]
-        //[Route("TopGenre")]
-
-        //public JsonResult GetTopGenre()
-        //{
-        //    string query = @"
-        //       SELECT * FROM books natural join library_user where id_user = @id_user
-        //    ";
-
-        //    DataTable table = new DataTable();
-        //    string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
-        //    NpgsqlDataReader dataReader;
-
-        //    using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
-        //    {
-        //        myCon.Open();
-        //        using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
-        //        {
-        //            dataReader = myCommand.ExecuteReader();
-        //            table.Load(dataReader);
-
-        //            dataReader.Close();
-        //            myCon.Close();
-
-        //        }
-        //    }
-
-
-
-        //    return new JsonResult(table);
-
-        //}
     }
 }
