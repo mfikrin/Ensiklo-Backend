@@ -267,37 +267,6 @@ namespace PPL.Controllers
             return new JsonResult("Deleted Successfully");
         }
 
-        //[HttpGet]
-        //[Route("search")]
-        
-        //public JsonResult Search([FromQuery(Name = "title")] string title)
-        //{
-        //    string query = @$"
-        //        SELECT *
-        //        FROM books b
-        //        WHERE b.title LIKE '%{title}%'
-        //    ";
-
-        //    DataTable table = new DataTable();
-        //    string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
-        //    NpgsqlDataReader dataReader;
-
-        //    using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
-        //    {
-        //        myCon.Open();
-        //        using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
-        //        {
-        //            dataReader = myCommand.ExecuteReader();
-        //            table.Load(dataReader);
-
-        //            dataReader.Close();
-        //            myCon.Close();
-        //        }
-        //    }
-
-        //    return new JsonResult(table);
-        //}
-
         [Route("search")]
         [HttpGet]
         public JsonResult Search([FromQuery(Name = "title")] string title)
