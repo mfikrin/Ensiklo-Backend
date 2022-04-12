@@ -320,5 +320,85 @@ namespace PPL.Controllers
 
         }
 
+        [HttpGet]
+        [Route("TopGenre/{id}/{limit}")]
+        public JsonResult GetTopGenre(int id, int limit)
+        {
+            string query = @"
+                SELECT * FROM books where category = (
+                SELECT category
+                    FROM     books b natural join library_user lu where id_user = @id_user
+                    GROUP BY category
+                    ORDER BY COUNT(category) DESC
+                    LIMIT    1
+                )
+                ORDER BY RANDOM() LIMIT @limit
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@id_user", id);
+                    myCommand.Parameters.AddWithValue("@limit", limit);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
+        [HttpGet]
+        [Route("MostPopular/{limit}")]
+        public JsonResult GetMostPopular(int limit)
+        {
+            string query = @"
+                SELECT id_book,title,author, publisher, year_published, description_book, book_content, url_cover, category, keywords, added_time, page
+                FROM books b natural join library_user lu 
+                GROUP BY id_book 
+                ORDER BY COUNT(id_book) DESC
+                LIMIT @limit
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@limit", limit);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
+
+
     }
 }
