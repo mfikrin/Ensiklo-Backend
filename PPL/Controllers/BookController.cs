@@ -267,36 +267,36 @@ namespace PPL.Controllers
             return new JsonResult("Deleted Successfully");
         }
 
-        [HttpGet]
-        [Route("search")]
+        //[HttpGet]
+        //[Route("search")]
         
-        public JsonResult Search([FromQuery(Name = "title")] string title)
-        {
-            string query = @$"
-                SELECT *
-                FROM books b
-                WHERE b.title LIKE '%{title}%'
-            ";
+        //public JsonResult Search([FromQuery(Name = "title")] string title)
+        //{
+        //    string query = @$"
+        //        SELECT *
+        //        FROM books b
+        //        WHERE b.title LIKE '%{title}%'
+        //    ";
 
-            DataTable table = new DataTable();
-            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
-            NpgsqlDataReader dataReader;
+        //    DataTable table = new DataTable();
+        //    string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+        //    NpgsqlDataReader dataReader;
 
-            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
-            {
-                myCon.Open();
-                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
-                {
-                    dataReader = myCommand.ExecuteReader();
-                    table.Load(dataReader);
+        //    using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+        //    {
+        //        myCon.Open();
+        //        using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+        //        {
+        //            dataReader = myCommand.ExecuteReader();
+        //            table.Load(dataReader);
 
-                    dataReader.Close();
-                    myCon.Close();
-                }
-            }
+        //            dataReader.Close();
+        //            myCon.Close();
+        //        }
+        //    }
 
-            return new JsonResult(table);
-        }
+        //    return new JsonResult(table);
+        //}
 
         [Route("search")]
         [HttpGet]
@@ -350,6 +350,53 @@ namespace PPL.Controllers
             return new JsonResult(table);
 
         }
+
+
+        //[HttpGet("{id}")]
+        //[Route("TopGenre")]
+
+        [HttpGet]
+        [Route("TopGenre/{id}/{limit}")]
+        public JsonResult GetTopGenre(int id, int limit)
+        {
+            string query = @"
+                SELECT * FROM books where category = (
+                SELECT category
+                    FROM     books b natural join library_user lu where id_user = @id_user
+                    GROUP BY category
+                    ORDER BY COUNT(category) DESC
+                    LIMIT    1
+                )
+                ORDER BY RANDOM() LIMIT @limit
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@id_user", id);
+                    myCommand.Parameters.AddWithValue("@limit", limit);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
+
 
     }
 }
