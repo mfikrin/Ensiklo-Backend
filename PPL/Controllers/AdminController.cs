@@ -17,6 +17,72 @@ namespace PPL.Controllers
             _configuration = configuration;
         }
 
+        [HttpGet]
+        [Route("GetTotalUser")]
+
+        public JsonResult GetTotalUser()
+        {
+            string query = @$"
+               SELECT COUNT(*) as num_users FROM users
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
+        [HttpGet]
+        [Route("GetTotalAdmin")]
+
+        public JsonResult GetTotalAdmin()
+        {
+            string query = @$"
+               SELECT COUNT(*) as num_admin FROM admin
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
         [Route("login")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
