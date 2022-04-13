@@ -200,7 +200,7 @@ namespace PPL.Controllers
 
         [Route("getAdmin/{id}")]
         [HttpGet]
-        public JsonResult GetUser(Int64 id)
+        public JsonResult GetAdmin(Int64 id)
         {
             Debug.WriteLine(HttpContext.Request.Cookies["authToken"]);
             string query = @$"
@@ -236,7 +236,7 @@ namespace PPL.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult GetCurrent()
+        public IActionResult GetCurrentAdmin()
         {
             if (HttpContext.Request.Cookies["authToken"] is null)
             {
