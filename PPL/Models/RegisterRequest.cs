@@ -9,8 +9,7 @@ namespace PPL.Models
 
         [Required(AllowEmptyStrings = false)]
         public string Username { get; set; }
-        public string Role { get; set; }
-
+        
         [Required(AllowEmptyStrings = false)]
         public string Password { get; set; }    
     }
