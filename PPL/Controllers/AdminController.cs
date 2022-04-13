@@ -55,12 +55,12 @@ namespace PPL.Controllers
             {
                 return Unauthorized();
             }
-            Int64 admin_id = table.Rows[0].Field<Int64>("id_user");
+            Int64 admin_id = table.Rows[0].Field<Int64>("id_admin");
             string token = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
 
             query = @"
-                INSERT INTO auth_tokens_admin(token, id_user)
-                values (@token, @id_user)
+                INSERT INTO auth_tokens_admin(token, id_admin)
+                values (@token, @id_admin)
             ";
 
             using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
@@ -69,7 +69,7 @@ namespace PPL.Controllers
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
                     myCommand.Parameters.AddWithValue("@token", token);
-                    myCommand.Parameters.AddWithValue("id_user", admin_id);
+                    myCommand.Parameters.AddWithValue("id_admin", admin_id);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -95,10 +95,6 @@ namespace PPL.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Post(RegisterRequest admin)
         {
-            //if (user.Role == null)
-            //{
-            //    user.Role = "admin";
-            //}
 
             if (!ModelState.IsValid)
             {
