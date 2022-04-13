@@ -398,6 +398,75 @@ namespace PPL.Controllers
 
         }
 
+        [HttpGet]
+        [Route("NewArrival/{limit}")]
+        public JsonResult GetNewArrival(int limit)
+        {
+            string query = @"
+                SELECT *
+                FROM books
+                ORDER BY added_time DESC
+                LIMIT @limit
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@limit", limit);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
+        [HttpGet]
+        [Route("NewArrival")]
+        public JsonResult GetAllNewArrival()
+        {
+            string query = @"
+                SELECT *
+                FROM books
+                ORDER BY added_time DESC
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+            return new JsonResult(table);
+
+        }
+
+
+
 
 
     }
