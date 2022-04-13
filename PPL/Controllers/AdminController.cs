@@ -8,11 +8,11 @@ namespace PPL.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : Controller
+    public class AdminController : Controller
     {
         private readonly IConfiguration _configuration;
 
-        public UserController(IConfiguration configuration)
+        public AdminController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -29,7 +29,7 @@ namespace PPL.Controllers
             }
 
             string query = @"
-                SELECT * FROM users where email=@req_email
+                SELECT * FROM admin where email=@req_email
             ";
 
             DataTable table = new DataTable();
@@ -51,15 +51,15 @@ namespace PPL.Controllers
                 }
             }
 
-            if(table.Rows.Count == 0 || !table.Rows[0].Field<string>("password").Equals(req.Password))
+            if (table.Rows.Count == 0 || !table.Rows[0].Field<string>("password").Equals(req.Password))
             {
                 return Unauthorized();
             }
-            Int64 user_id = table.Rows[0].Field<Int64>("id_user");
+            Int64 admin_id = table.Rows[0].Field<Int64>("id_user");
             string token = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
 
             query = @"
-                INSERT INTO auth_tokens(token, id_user)
+                INSERT INTO auth_tokens_admin(token, id_user)
                 values (@token, @id_user)
             ";
 
@@ -69,7 +69,7 @@ namespace PPL.Controllers
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
                     myCommand.Parameters.AddWithValue("@token", token);
-                    myCommand.Parameters.AddWithValue("id_user", user_id);
+                    myCommand.Parameters.AddWithValue("id_user", admin_id);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -80,20 +80,24 @@ namespace PPL.Controllers
                 }
             }
 
-            HttpContext.Response.Cookies.Append("authToken", token, new CookieOptions { 
-                Expires=DateTime.Now.AddYears(5), IsEssential=true, SameSite= SameSiteMode.Lax});
-            return Ok(token) ;
+            HttpContext.Response.Cookies.Append("authToken", token, new CookieOptions
+            {
+                Expires = DateTime.Now.AddYears(5),
+                IsEssential = true,
+                SameSite = SameSiteMode.Lax
+            });
+            return Ok(token);
         }
 
         [Route("register")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult Post(RegisterRequest user)
+        public IActionResult Post(RegisterRequest admin)
         {
             //if (user.Role == null)
             //{
-            //    user.Role = "user";
+            //    user.Role = "admin";
             //}
 
             if (!ModelState.IsValid)
@@ -103,7 +107,7 @@ namespace PPL.Controllers
 
             string query = @"
                 INSERT INTO 
-                users(email,password,username)
+                admin(email,password,username)
                 values (@email,@password,@username)
             ";
 
@@ -115,9 +119,9 @@ namespace PPL.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@email", user.Email);
-                    myCommand.Parameters.AddWithValue("@username", user.Username);
-                    myCommand.Parameters.AddWithValue("@password", user.Password);
+                    myCommand.Parameters.AddWithValue("@email", admin.Email);
+                    myCommand.Parameters.AddWithValue("@username", admin.Username);
+                    myCommand.Parameters.AddWithValue("@password", admin.Password);
                    
 
                     myReader = myCommand.ExecuteReader();
@@ -132,13 +136,13 @@ namespace PPL.Controllers
             return Ok();
         }
 
-        [Route("getUser/{id}")]
+        [Route("getAdmin/{id}")]
         [HttpGet]
         public JsonResult GetUser(Int64 id)
         {
             Debug.WriteLine(HttpContext.Request.Cookies["authToken"]);
             string query = @$"
-               SELECT * FROM users where id_user=@id
+               SELECT * FROM admin where id_admin=@id
             ";
 
             DataTable table = new DataTable();
@@ -166,7 +170,7 @@ namespace PPL.Controllers
 
         }
 
-        [Route("currentUser")]
+        [Route("currentAdmin")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -178,14 +182,14 @@ namespace PPL.Controllers
             }
             string token = HttpContext.Request.Cookies["authToken"];
             string query = @$"
-               SELECT * FROM users where id_user=@id
+               SELECT * FROM admin where id_admin=@id
             ";
 
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
             NpgsqlDataReader dataReader;
 
-            Int64 id = ControllerUtils.authenticateUser(token, sqlDataSource);
+            Int64 id = ControllerUtils.authenticateAdmin(token, sqlDataSource);
 
             using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
             {
@@ -207,7 +211,5 @@ namespace PPL.Controllers
             return new JsonResult(table);
 
         }
-
-
     }
 }
