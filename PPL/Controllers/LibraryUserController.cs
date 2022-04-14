@@ -226,5 +226,39 @@ namespace PPL.Controllers
             return new JsonResult("Deleted Successfully");
         }
 
+        [HttpGet]
+        [Route("FinishedBooks/{user_id}")]
+        public JsonResult GetTopGenre(int user_id)
+        {
+            string query = @"
+                select * from library_user where id_user = @id_user and finish_reading = true;
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@id_user", user_id);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
+
     }
 }
