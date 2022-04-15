@@ -195,8 +195,8 @@ namespace PPL.Controllers
         {
             string query = @"
                 INSERT INTO 
-                library_user(id_user,id_book,at_page,last_readtime)
-                values (@id_user,@id_book,@at_page,@last_readtime)
+                library_user(id_user,id_book,at_page,last_readtime,finish_reading)
+                values (@id_user,@id_book,@at_page,@last_readtime,@finish_reading)
             ";
 
             DataTable table = new DataTable();
@@ -210,12 +210,13 @@ namespace PPL.Controllers
                     myCommand.Parameters.AddWithValue("@id_user", libraryUser.Id_user);
                     myCommand.Parameters.AddWithValue("@id_book", libraryUser.Id_book);
                     myCommand.Parameters.AddWithValue("@at_page", libraryUser.At_page);
-
+                    
+                    /*
                     DateTime time = DateTime.Now;
                     Debug.WriteLine(time);
-                    myCommand.Parameters.AddWithValue("@last_readtime", time);
-
-                    //myCommand.Parameters.AddWithValue("@last_readtime", libraryUser.Last_readtime);
+                    myCommand.Parameters.AddWithValue("@last_readtime", time);*/
+                    myCommand.Parameters.AddWithValue("@last_readtime", libraryUser.Last_readtime);
+                    myCommand.Parameters.AddWithValue("@finish_reading", false);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -223,8 +224,11 @@ namespace PPL.Controllers
                     myReader.Close();
                     myCon.Close();
 
+
                 }
             }
+
+            Debug.WriteLine("Book added");
 
             return new JsonResult("Added to Library Successfully");
         }
