@@ -55,6 +55,40 @@ namespace PPL.Controllers
 
         }
 
+        // GET: api/<LibraryUserController>
+        [HttpGet("get/{id_user}/{id_book}")]
+        public JsonResult GetLibraryUserItem(int id_user, int id_book)
+        {
+            string query = @"
+               SELECT * FROM books natural join library_user where id_user = @id_user and id_book = @id_book
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@id_user", id_user);
+                    myCommand.Parameters.AddWithValue("@id_book", id_book);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
         [HttpGet]
         [Route("sort/title")]
 
@@ -194,6 +228,8 @@ namespace PPL.Controllers
 
             return new JsonResult("Added to Library Successfully");
         }
+
+
 
         // DELETE api/<LibraryUserController>/5
         [HttpDelete("{id_user}/{id_book}")]
