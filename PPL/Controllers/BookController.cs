@@ -130,8 +130,8 @@ namespace PPL.Controllers
         {
             string query = @"
                 INSERT INTO 
-                books(title,author,publisher,year_published,description_book,book_content,page,url_cover,category,added_time,keywords)
-                values (@title,@author,@publisher,@year_published,@description_book,@book_content,@page,@url_cover,@category,@added_time,@keywords)
+                books(title,author,publisher,year_published,description_book,book_content,page,url_cover,category,added_time,keywords,isbn)
+                values (@title,@author,@publisher,@year_published,@description_book,@book_content,@page,@url_cover,@category,@added_time,@keywords,@isbn)
             ";
 
             DataTable table = new DataTable();
@@ -172,6 +172,7 @@ namespace PPL.Controllers
 
                     myCommand.Parameters.AddWithValue("@added_time", book.Added_time);
                     myCommand.Parameters.AddWithValue("@keywords", book.Keywords);
+                    myCommand.Parameters.AddWithValue("@isbn", book.Isbn);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -202,6 +203,7 @@ namespace PPL.Controllers
                 category = @category,
                 added_time = @added_time,
                 keywords = @keywords
+                isbn = @isbn
 
                 WHERE id_book=@id_book 
             ";
@@ -225,6 +227,7 @@ namespace PPL.Controllers
                     myCommand.Parameters.AddWithValue("@category", book.Category);
                     myCommand.Parameters.AddWithValue("@added_time", book.Added_time);
                     myCommand.Parameters.AddWithValue("@keywords", book.Keywords);
+                    myCommand.Parameters.AddWithValue("@isbn", book.Isbn);
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
 
@@ -366,7 +369,7 @@ namespace PPL.Controllers
         public JsonResult GetMostPopular(int limit)
         {
             string query = @"
-                SELECT id_book,title,author, publisher, year_published, description_book, book_content, url_cover, category, keywords, added_time, page
+                SELECT id_book,title,author, publisher, year_published, description_book, book_content, url_cover, category, keywords, added_time, page, isbn
                 FROM books b natural join library_user lu 
                 GROUP BY id_book 
                 ORDER BY COUNT(id_book) DESC

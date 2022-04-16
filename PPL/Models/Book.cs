@@ -14,5 +14,6 @@
         public string Category { get; set; }
         public DateTime Added_time { get; set; }
         public string Keywords { get; set; }
+        public string Isbn { get; set; }
     }
 }
