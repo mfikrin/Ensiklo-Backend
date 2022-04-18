@@ -90,12 +90,12 @@ namespace PPL.Controllers
         }
 
         [HttpGet]
-        [Route("sort/title")]
+        [Route("sort/title/{id}")]
 
-        public JsonResult SortTitle()
+        public JsonResult SortTitle(int id)
         {
             string query = @"
-               SELECT * FROM books b order by b.title
+               SELECT * FROM books natural join library_user where id_user = @id_user order by title
             ";
 
             DataTable table = new DataTable();
@@ -107,6 +107,7 @@ namespace PPL.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
+                    myCommand.Parameters.AddWithValue("@id_user", id);
                     dataReader = myCommand.ExecuteReader();
                     table.Load(dataReader);
 
@@ -123,11 +124,11 @@ namespace PPL.Controllers
         }
 
         [HttpGet]
-        [Route("sort/AddedTime")]
-        public JsonResult SortAddedTime()
+        [Route("sort/AddedTime/{id}")]
+        public JsonResult SortAddedTime(int id)
         {
             string query = @"
-               SELECT * FROM books b order by b.added_time
+               SELECT * FROM books natural join library_user where id_user = @id_user order by added_time_to_library DESC
             ";
 
             DataTable table = new DataTable();
@@ -139,6 +140,7 @@ namespace PPL.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
+                    myCommand.Parameters.AddWithValue("@id_user", id);
                     dataReader = myCommand.ExecuteReader();
                     table.Load(dataReader);
 
@@ -161,7 +163,7 @@ namespace PPL.Controllers
         public JsonResult SortLastRead(int id)
         {
             string query = @"
-               SELECT * FROM books natural join library_user where id_user = @id_user order by last_readtime
+               SELECT * FROM books natural join library_user where id_user = @id_user order by last_readtime DESC
             ";
 
             DataTable table = new DataTable();
@@ -195,8 +197,8 @@ namespace PPL.Controllers
         {
             string query = @"
                 INSERT INTO 
-                library_user(id_user,id_book,at_page,last_readtime,finish_reading)
-                values (@id_user,@id_book,@at_page,@last_readtime,@finish_reading)
+                library_user(id_user,id_book,at_page,last_readtime,finish_reading, added_time_to_library)
+                values (@id_user,@id_book,@at_page,@last_readtime,@finish_reading, @added_time_to_library)
             ";
 
             DataTable table = new DataTable();
@@ -211,12 +213,9 @@ namespace PPL.Controllers
                     myCommand.Parameters.AddWithValue("@id_book", libraryUser.Id_book);
                     myCommand.Parameters.AddWithValue("@at_page", libraryUser.At_page);
                     
-                    /*
-                    DateTime time = DateTime.Now;
-                    Debug.WriteLine(time);
-                    myCommand.Parameters.AddWithValue("@last_readtime", time);*/
                     myCommand.Parameters.AddWithValue("@last_readtime", libraryUser.Last_readtime);
                     myCommand.Parameters.AddWithValue("@finish_reading", false);
+                    myCommand.Parameters.AddWithValue("@added_time_to_library", libraryUser.Added_time_to_library);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
