@@ -275,19 +275,17 @@ namespace PPL.Controllers
         public JsonResult Search([FromQuery(Name = "title")] string title)
         {
             string query = @$"
-                SELECT id_book, title, url_cover
+                SELECT *
                 FROM (
                     SELECT
-                        b.id_book,
-                        b.title,
-                        b.url_cover,
                         CASE
                             WHEN b.title LIKE '%{title}%' THEN 4
                             WHEN b.author LIKE '%{title}%' THEN 3
                             WHEN b.publisher LIKE '%{title}%' THEN 2
                             WHEN b.description_book LIKE '%{title}%' THEN 1
                             ELSE 0
-                        END AS score
+                        END AS score,
+                        b.*
 
                     FROM books b
                     WHERE

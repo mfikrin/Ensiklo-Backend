@@ -209,5 +209,50 @@ namespace PPL.Controllers
         }
 
 
+        [Route("updateUser/{id}")]
+        [HttpPut]
+        public JsonResult UpdateUser(Int64 id,RegisterRequest user)
+        {
+            Debug.WriteLine(HttpContext.Request.Cookies["authToken"]);
+            Debug.WriteLine(id);
+            Debug.WriteLine(user);
+            string query = @$"
+               UPDATE users
+               SET
+
+               email = @email,
+               password = @password,
+               username = @username
+
+               WHERE id_user=@id
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@id", id);
+                    myCommand.Parameters.AddWithValue("@email", user.Email);
+                    myCommand.Parameters.AddWithValue("@username", user.Username);
+                    myCommand.Parameters.AddWithValue("@password", user.Password);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
     }
 }
