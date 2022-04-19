@@ -186,8 +186,9 @@ namespace PPL.Controllers
             return new JsonResult("Added Successfully");
         }
 
+        [Route("updateBook/{id}")]
         [HttpPut]
-        public JsonResult Put(Book book)
+        public JsonResult Put(int id, Book book)
         {
             string query = @"
                 UPDATE books
@@ -202,10 +203,10 @@ namespace PPL.Controllers
                 url_cover = @url_cover,
                 category = @category,
                 added_time = @added_time,
-                keywords = @keywords
+                keywords = @keywords,
                 isbn = @isbn
 
-                WHERE id_book=@id_book 
+                WHERE id_book=@id
             ";
 
             DataTable table = new DataTable();
@@ -228,6 +229,7 @@ namespace PPL.Controllers
                     myCommand.Parameters.AddWithValue("@added_time", book.Added_time);
                     myCommand.Parameters.AddWithValue("@keywords", book.Keywords);
                     myCommand.Parameters.AddWithValue("@isbn", book.Isbn);
+                    myCommand.Parameters.AddWithValue("@id", id);
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
 
