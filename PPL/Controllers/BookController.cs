@@ -321,6 +321,78 @@ namespace PPL.Controllers
 
         }
 
+        [Route("GetByAuthor")]
+        [HttpGet]
+        public JsonResult GetByAuthor([FromQuery(Name = "author")] string author)
+        {
+            string query = @"
+                   SELECT * FROM books
+                   WHERE author=@author
+            ";
+
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@author", author);
+
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
+        [Route("GetByPublisher")]
+        [HttpGet]
+        public JsonResult GetByTitle([FromQuery(Name = "publisher")] string publisher)
+        {
+            string query = @"
+                   SELECT * FROM books
+                   WHERE publisher=@publisher
+            ";
+
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@publisher", publisher);
+
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
         [HttpGet]
         [Route("TopGenre/{id}/{limit}")]
         public JsonResult GetTopGenre(int id, int limit)
