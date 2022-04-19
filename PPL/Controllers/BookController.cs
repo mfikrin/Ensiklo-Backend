@@ -130,8 +130,8 @@ namespace PPL.Controllers
         {
             string query = @"
                 INSERT INTO 
-                books(title,author,publisher,year_published,description_book,book_content,page,url_cover,category,added_time,keywords)
-                values (@title,@author,@publisher,@year_published,@description_book,@book_content,@page,@url_cover,@category,@added_time,@keywords)
+                books(title,author,publisher,year_published,description_book,book_content,page,url_cover,category,added_time,keywords,isbn)
+                values (@title,@author,@publisher,@year_published,@description_book,@book_content,@page,@url_cover,@category,@added_time,@keywords,@isbn)
             ";
 
             DataTable table = new DataTable();
@@ -172,6 +172,7 @@ namespace PPL.Controllers
 
                     myCommand.Parameters.AddWithValue("@added_time", book.Added_time);
                     myCommand.Parameters.AddWithValue("@keywords", book.Keywords);
+                    myCommand.Parameters.AddWithValue("@isbn", book.Isbn);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -202,6 +203,7 @@ namespace PPL.Controllers
                 category = @category,
                 added_time = @added_time,
                 keywords = @keywords
+                isbn = @isbn
 
                 WHERE id_book=@id_book 
             ";
@@ -225,6 +227,7 @@ namespace PPL.Controllers
                     myCommand.Parameters.AddWithValue("@category", book.Category);
                     myCommand.Parameters.AddWithValue("@added_time", book.Added_time);
                     myCommand.Parameters.AddWithValue("@keywords", book.Keywords);
+                    myCommand.Parameters.AddWithValue("@isbn", book.Isbn);
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
 
@@ -318,6 +321,78 @@ namespace PPL.Controllers
 
         }
 
+        [Route("GetByAuthor")]
+        [HttpGet]
+        public JsonResult GetByAuthor([FromQuery(Name = "author")] string author)
+        {
+            string query = @"
+                   SELECT * FROM books
+                   WHERE author=@author
+            ";
+
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@author", author);
+
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
+        [Route("GetByPublisher")]
+        [HttpGet]
+        public JsonResult GetByTitle([FromQuery(Name = "publisher")] string publisher)
+        {
+            string query = @"
+                   SELECT * FROM books
+                   WHERE publisher=@publisher
+            ";
+
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@publisher", publisher);
+
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
         [HttpGet]
         [Route("TopGenre/{id}/{limit}")]
         public JsonResult GetTopGenre(int id, int limit)
@@ -364,7 +439,7 @@ namespace PPL.Controllers
         public JsonResult GetMostPopular(int limit)
         {
             string query = @"
-                SELECT id_book,title,author, publisher, year_published, description_book, book_content, url_cover, category, keywords, added_time, page
+                SELECT id_book,title,author, publisher, year_published, description_book, book_content, url_cover, category, keywords, added_time, page, isbn
                 FROM books b natural join library_user lu 
                 GROUP BY id_book 
                 ORDER BY COUNT(id_book) DESC

@@ -265,5 +265,92 @@ namespace PPL.Controllers
             return new JsonResult("Deleted Successfully");
         }
 
+        [HttpGet]
+        [Route("FinishedBooks/{user_id}")]
+        public JsonResult GetTopGenre(int user_id)
+        {
+            string query = @"
+                select * from library_user where id_user = @id_user and finish_reading = true;
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@id_user", user_id);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
+        [Route("search")]
+        [HttpGet]
+        public JsonResult Search([FromQuery(Name = "title")] string title, [FromQuery(Name = "user_id")] int user_id)
+        {
+            string query = @$"
+                SELECT *
+                FROM (
+                    SELECT
+                        CASE
+                            WHEN b.title LIKE '%{title}%' THEN 4
+                            WHEN b.author LIKE '%{title}%' THEN 3
+                            WHEN b.publisher LIKE '%{title}%' THEN 2
+                            WHEN b.description_book LIKE '%{title}%' THEN 1
+                            ELSE 0
+                        END AS score,
+                        b.*
+
+                    FROM books b natural join library_user 
+                    WHERE
+                        id_user = @id_user AND
+                        b.title LIKE '%{title}%' OR
+                        b.author LIKE '%{title}%' OR
+                        b.publisher LIKE '%{title}%' OR
+                        b.description_book LIKE '%{title}%'
+                    ORDER BY score DESC
+                ) final              
+                ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@id_user", user_id);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
+
+
     }
 }
