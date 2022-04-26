@@ -351,6 +351,41 @@ namespace PPL.Controllers
 
         }
 
+        [Route("updateFinishStatus/{id_user}/{id_book}")]
+        [HttpPut]
+        public JsonResult Put(int id_user, int id_book)
+        {
+            string query = @"
+                UPDATE library_user
+                SET 
+                finish_reading = @finish_reading
+
+                WHERE id_book=@id_book AND id_user=@id_user
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader myReader;
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@id_user", id_user);
+                    myCommand.Parameters.AddWithValue("@id_book", id_book);
+                    myCommand.Parameters.AddWithValue("@finish_reading", true);
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+
+                    myReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+            return new JsonResult("Updated Successfully");
+        }
+
 
     }
 }
