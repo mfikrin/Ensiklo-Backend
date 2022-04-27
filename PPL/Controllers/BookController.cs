@@ -142,23 +142,9 @@ namespace PPL.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@title", book.Title.ToLower());
+                    myCommand.Parameters.AddWithValue("@title", book.Title);
                     myCommand.Parameters.AddWithValue("@author", book.Author);
                     myCommand.Parameters.AddWithValue("@publisher", book.Publisher);
-
-                    //DateOnly dateOnly = DateOnly.FromDateTime(DateTime.Now);
-                    ////DateOnly dateTime = new DateOnly(2000, 3, 10);
-                    //DateTime dateTime = new DateTime(2000, 3, 10);
-
-                    ////DateTime dateTime = book.Year_published;
-
-                    //string dateTimeStr = dateTime.ToString("yyyy-MM-dd");
-
-                    //myCommand.Parameters.AddWithValue("@year_published", dateTimeStr);
-
-                    //DateTime dateTime = new DateTime(2000, 7, 24);
-
-                    //myCommand.Parameters.AddWithValue("@year_published", dateTime);
 
                     myCommand.Parameters.AddWithValue("@year_published", book.Year_published);
                     myCommand.Parameters.AddWithValue("@description_book", book.Description_book);
