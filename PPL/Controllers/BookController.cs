@@ -276,25 +276,26 @@ namespace PPL.Controllers
         [HttpGet]
         public JsonResult Search([FromQuery(Name = "title")] string title)
         {
+            title = title.ToLower();
             string query = @$"
                 SELECT *
                 FROM (
                     SELECT
                         CASE
-                            WHEN b.title LIKE '%{title}%' THEN 4
-                            WHEN b.author LIKE '%{title}%' THEN 3
-                            WHEN b.publisher LIKE '%{title}%' THEN 2
-                            WHEN b.description_book LIKE '%{title}%' THEN 1
+                            WHEN LOWER(b.title) LIKE '%{title}%' THEN 4
+                            WHEN LOWER(b.author) LIKE '%{title}%' THEN 3
+                            WHEN LOWER(b.publisher) LIKE '%{title}%' THEN 2
+                            WHEN LOWER(b.description_book) LIKE '%{title}%' THEN 1
                             ELSE 0
                         END AS score,
                         b.*
 
                     FROM books b
                     WHERE
-                        b.title LIKE '%{title}%' OR
-                        b.author LIKE '%{title}%' OR
-                        b.publisher LIKE '%{title}%' OR
-                        b.description_book LIKE '%{title}%'
+                        LOWER(b.title) LIKE '%{title}%' OR
+                        LOWER(b.author) LIKE '%{title}%' OR
+                        LOWER(b.publisher) LIKE '%{title}%' OR
+                        LOWER(b.description_book) LIKE '%{title}%'
                     ORDER BY score DESC
                 ) final              
                 ";
