@@ -254,5 +254,50 @@ namespace PPL.Controllers
             return new JsonResult(table);
 
         }
+
+        [Route("Logout")]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult Logout([FromQuery(Name = "token")] string usertoken=null)
+        {
+            string token;
+            if (HttpContext.Request.Cookies["authToken"] is null)
+            {
+                token = usertoken;
+                Debug.WriteLine("LOGOUT: auth token cookie is null");
+            } else
+            {
+                token = HttpContext.Request.Cookies["authToken"];
+                HttpContext.Response.Cookies.Delete("authToken");
+            }
+            string query = @$"
+               DELETE FROM auth_tokens where token=@token
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@token", token);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
+
+
+
+            return new JsonResult(table);
+
+        }
     }
 }
