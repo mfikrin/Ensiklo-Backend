@@ -83,7 +83,39 @@ namespace PPL.Controllers
                 }
             }
 
+            return new JsonResult(table);
 
+        }
+
+        [HttpPost("update/{id_user}/{id_book}/{page}")]
+        public JsonResult UpdateProgressLibraryItem(int id_user, int id_book, int page)
+        {
+            string query = @"
+               UPDATE library_user
+               SET at_page = @page
+               WHERE id_user = @id_user and id_book = @id_book               
+            ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EnsikloAppCon");
+            NpgsqlDataReader dataReader;
+
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@id_user", id_user);
+                    myCommand.Parameters.AddWithValue("@id_book", id_book);
+                    myCommand.Parameters.AddWithValue("@page", page);
+                    dataReader = myCommand.ExecuteReader();
+                    table.Load(dataReader);
+
+                    dataReader.Close();
+                    myCon.Close();
+
+                }
+            }
 
             return new JsonResult(table);
 
@@ -211,7 +243,7 @@ namespace PPL.Controllers
                 {
                     myCommand.Parameters.AddWithValue("@id_user", libraryUser.Id_user);
                     myCommand.Parameters.AddWithValue("@id_book", libraryUser.Id_book);
-                    myCommand.Parameters.AddWithValue("@at_page", libraryUser.At_page);
+                    myCommand.Parameters.AddWithValue("@at_page", 1);
                     
                     myCommand.Parameters.AddWithValue("@last_readtime", libraryUser.Last_readtime);
                     myCommand.Parameters.AddWithValue("@finish_reading", false);
