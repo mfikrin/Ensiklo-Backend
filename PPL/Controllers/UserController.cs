@@ -172,10 +172,10 @@ namespace PPL.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult GetCurrent()
         {
-            if (HttpContext.Request.Cookies["authToken"] is null)
-            {
-                return Unauthorized();
-            }
+            //if (HttpContext.Request.Cookies["authToken"] is null)
+            //{
+            //    return Unauthorized();
+            //}
             string token = HttpContext.Request.Cookies["authToken"];
             string query = @$"
                SELECT * FROM users where id_user=@id
